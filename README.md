@@ -2,7 +2,8 @@ Honey4
 =====
 
 Enjoy honeycobm:honeybee:
-<img src="https://github.com/sktnkysh/honey4/blob/master/docs/honeycobm.gif" width="200" />
+<br>
+<img src="https://github.com/sktnkysh/honey4/blob/master/docs/honeycobm.gif" width="300" />
 
 ## Demo
 
