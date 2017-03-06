@@ -1,6 +1,4 @@
-# React-games
-
-* HoneyComb
+# Honey4
 
 ## requirement
 
@@ -9,6 +7,7 @@
 ## setup
 
 `npm install`
+`typings install`
 
 ## build
 
@@ -16,4 +15,6 @@
 
 ## run
 
-`npm run start`
+`python3 -m http.server 8080`
+
+access localhost:8080/dist

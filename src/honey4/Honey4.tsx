@@ -59,7 +59,6 @@ export class Honey4 extends React.Component<Props, {}> {
     })})};
     honeyComb(WIDTH, HEIGHT, INTERVAL);
 
-
     canvas.onmousedown = e => {
       // mouse2honey
       const r = INTERVAL/(Math.cos(TPI/12)*2);
@@ -123,5 +122,4 @@ export class Honey4 extends React.Component<Props, {}> {
     honeyComb(WIDTH, HEIGHT, INTERVAL);
 
   }
-
 }

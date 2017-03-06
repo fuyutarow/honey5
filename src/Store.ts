@@ -1,7 +1,5 @@
-// store
-import honey4 from './honey4/module';
-import ahiru from './ahiru/module';
 import { createStore, combineReducers } from 'redux';
+import honey4 from './honey4/module';
 
 export default createStore(
   combineReducers({
