@@ -17,10 +17,8 @@ export class Honey4 extends React.Component<Props, {}> {
     this.cells = this.props.state.cells;
     this.step = this.props.state.step;
 
-    const table = this.props.state.cells.map( a => <tr>{a}</tr> )
     return (
       <div>
-        <table>{ table }</table>
         <p><h3>STEP: { this.props.state.step }</h3></p>
         <canvas ref="myCanvas"/>
       </div>

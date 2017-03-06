@@ -1,4 +1,7 @@
-# Honey4
+Honey4
+=====
+
+Enjoy honeycobm:honeybee:
 
 ## requirement
 
@@ -6,8 +9,10 @@
 
 ## setup
 
-`npm install`
-`typings install`
+```shell
+npm install
+typings install
+```
 
 ## build
 
@@ -15,6 +20,6 @@
 
 ## run
 
-`python3 -m http.server 8080`
+`python3 -m http.server 8000`
 
-access localhost:8080/dist
+access localhost:8000/dist
