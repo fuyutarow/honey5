@@ -1,7 +1,6 @@
 Honey4
 =====
 
-Enjoy honeycobm:honeybee:
 <br>
 <a href="https://sktnkysh.github.io/honey4/">
 <img src="https://github.com/sktnkysh/honey4/blob/master/docs/honeycobm.gif" width="300" />
@@ -30,3 +29,5 @@ typings install
 `python3 -m http.server 8000`
 
 access localhost:8000/dist
+<br>
+Enjoy honeycobm:honeybee::honeybee:
