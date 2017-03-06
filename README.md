@@ -2,7 +2,7 @@ Honey4
 =====
 
 Enjoy honeycobm:honeybee:
-![](https://github.com/sktnkysh/honey4/blob/master/docs/honeycobm.gif =250x)
+![](https://github.com/sktnkysh/honey4/blob/master/docs/honeycobm.gif)
 
 ## Demo
 
