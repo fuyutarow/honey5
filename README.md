@@ -2,24 +2,28 @@ Honey4
 =====
 
 Enjoy honeycobm:honeybee:
+![](https://github.com/sktnkysh/honey4/blob/master/docs/honeycobm.gif =250x)
 
-## requirement
+## Demo
+
+https://sktnkysh.github.io/honey4/
+
+## Requirement
 
 - NodeJS 5.X+
 
-## setup
+## Install
 
+### setup
 ```shell
 npm install
 typings install
 ```
 
-## build
-
+### build
 `npm run build`
 
-## run
-
+### run
 `python3 -m http.server 8000`
 
 access localhost:8000/dist
