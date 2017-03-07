@@ -29031,7 +29031,7 @@ var Honey5 = (function (_super) {
                 .reduce(function (a, b) { return Math.min(a, b); })) % 1000;
             var honeyX = idx % 20;
             var honeyY = Math.floor(idx / 20);
-            if (_this.props.state.step % 2 == 1) {
+            if (_this.props.state.step % 2 == 0) {
                 if (_this.props.state.cells[honeyX][honeyY] != -1) {
                     _this.props.actions.red([honeyX, honeyY]);
                 }
@@ -29071,10 +29071,10 @@ var Honey5 = (function (_super) {
                     ctx.fillStyle = '#ffff22';
                     break;
                 case 1:
-                    ctx.fillStyle = '#2222ff';
+                    ctx.fillStyle = '#ff2222';
                     break;
                 case -1:
-                    ctx.fillStyle = '#ff2222';
+                    ctx.fillStyle = '#2222ff';
                     break;
                 default: ctx.fillStyle = '#ffffff';
             }
@@ -29120,17 +29120,17 @@ var Honey5 = (function (_super) {
                 opNtimes(x, y, "left", n) + _this.props.state.cells[x][y] + opNtimes(x, y, "right", 4 - n),];
         })
             .reduce(function (a, b) { return a.concat(b); });
-        var redScore = scores.reduce(function (a, b) { return Math.min(a, b); });
-        var blueScore = scores.reduce(function (a, b) { return Math.max(a, b); });
+        var redScore = scores.reduce(function (a, b) { return Math.max(a, b); });
+        var blueScore = scores.reduce(function (a, b) { return Math.min(a, b); });
         ctx.fillStyle = "#000000";
         ctx.font = "80pt Arial";
         ctx.textAlign = "center";
-        if (redScore == -5) {
+        if (redScore == 5) {
             this.gameState = "GameOver";
             ctx.fillText("Red win!", WIDTH / 2, HEIGHT / 2);
             console.log(this.gameState);
         }
-        if (blueScore == 5) {
+        if (blueScore == -5) {
             this.gameState = "GameOver";
             ctx.fillText("Blue win", WIDTH / 2, HEIGHT / 2);
         }

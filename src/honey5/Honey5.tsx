@@ -81,7 +81,7 @@ export class Honey5 extends React.Component<Props, {}> {
       )%1000
       const honeyX = idx%20;
       const honeyY = Math.floor(idx/20);
-      if( this.props.state.step%2==1 ){
+      if( this.props.state.step%2==0 ){
         if ( this.props.state.cells[honeyX][honeyY] != -1 ){
           this.props.actions.red([honeyX, honeyY]);
         }
@@ -119,8 +119,8 @@ export class Honey5 extends React.Component<Props, {}> {
           const y = Math.floor(n/20)+1;
           switch( this.props.state.cells[x-1][y-1] ){
             case 0: ctx.fillStyle = '#ffff22';break;
-            case 1: ctx.fillStyle = '#2222ff';break;
-            case -1: ctx.fillStyle = '#ff2222';break;
+            case 1: ctx.fillStyle = '#ff2222';break;
+            case -1: ctx.fillStyle = '#2222ff';break;
             default: ctx.fillStyle = '#ffffff';
           };
           if (y%2==1) Hex( x*INTERVAL, y*R*3/2, R );
@@ -160,18 +160,18 @@ export class Honey5 extends React.Component<Props, {}> {
           opNtimes(x,y,"left",n)+this.props.state.cells[x][y]+ opNtimes(x,y,"right",4-n),          ])
       .reduce( (a,b) => a.concat(b) )
 
-    const redScore = scores.reduce( (a,b) => Math.min(a,b));
-    const blueScore = scores.reduce( (a,b) => Math.max(a,b));
+    const redScore = scores.reduce( (a,b) => Math.max(a,b));
+    const blueScore = scores.reduce( (a,b) => Math.min(a,b));
 
     ctx.fillStyle = "#000000";
     ctx.font = "80pt Arial";
     ctx.textAlign = "center";
-    if( redScore == -5 ){
+    if( redScore == 5 ){
       this.gameState = "GameOver";
       ctx.fillText("Red win!", WIDTH/2, HEIGHT/2);
       console.log(this.gameState);
     }
-    if( blueScore == 5 ){
+    if( blueScore == -5 ){
       this.gameState = "GameOver";
       ctx.fillText("Blue win", WIDTH/2, HEIGHT/2);
     }
