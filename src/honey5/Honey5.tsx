@@ -15,7 +15,7 @@ interface Props {
 }
 
 export class Honey5 extends React.Component<Props, {}> {
-  cells: number[];
+  cells: number[]; // p == x + y*20
   step: number;
   gameState: string;
 
@@ -79,8 +79,6 @@ export class Honey5 extends React.Component<Props, {}> {
         return p;
       }
       const honeyP = mouse2honey( e.offsetX, e.offsetY );
-      const honeyX = honeyP%20
-      const honeyY = Math.floor(honeyP/20);
       if( this.props.state.step%2 == 0 ){
         if( this.props.state.cells[honeyP] != -1 ){
           this.props.actions.red([honeyP]);
