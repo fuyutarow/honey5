@@ -1,8 +1,8 @@
 import { createStore, combineReducers } from 'redux';
-import honey4 from './honey4/module';
+import honey5 from './honey5/module';
 
 export default createStore(
   combineReducers({
-    honey4: honey4
+    honey5: honey5
   })
 );

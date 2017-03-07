@@ -1,23 +1,23 @@
 import * as Immutable from 'immutable';
 
-export interface Honey4State {
+export interface Honey5State {
   num: number;
   cells: number[][];
   step: number;
   record: number[][];
 }
 
-interface Honey4Action {
+  interface Honey5Action {
   type: string;
   amount?: number;
   position?: number[];
 }
 
 export class ActionTypes {
-  static INCREMENT = 'honey4/increment';
-  static RED = 'honey4/red';
-  static BLUE = 'honey4/blue';
-  static UNDO = 'honey4/undo';
+  static INCREMENT = 'honey5/increment';
+  static RED = 'honey5/red';
+  static BLUE = 'honey5/blue';
+  static UNDO = 'honey5/undo';
 }
 
 const INITIAL_STATE =  {
@@ -30,9 +30,9 @@ const INITIAL_STATE =  {
 };
 
 export default function reducer(
-  state: Honey4State = INITIAL_STATE,
-  action: Honey4Action
-): Honey4State {
+  state: Honey5State = INITIAL_STATE,
+  action: Honey5Action
+): Honey5State {
   switch (action.type) {
     case ActionTypes.INCREMENT:
       const newNum = state.num + action.amount

@@ -15339,10 +15339,10 @@ var ActionTypes = (function () {
     return ActionTypes;
 }());
 
-ActionTypes.INCREMENT = 'honey4/increment';
-ActionTypes.RED = 'honey4/red';
-ActionTypes.BLUE = 'honey4/blue';
-ActionTypes.UNDO = 'honey4/undo';
+ActionTypes.INCREMENT = 'honey5/increment';
+ActionTypes.RED = 'honey5/red';
+ActionTypes.BLUE = 'honey5/blue';
+ActionTypes.UNDO = 'honey5/undo';
 var INITIAL_STATE = {
     num: 0,
     position: [0, 0],
@@ -15457,11 +15457,11 @@ module.exports = __webpack_require__(135);
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_redux__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__honey4_module__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__honey5_module__ = __webpack_require__(93);
 
 
 /* harmony default export */ __webpack_exports__["a"] = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_redux__["b" /* createStore */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_redux__["c" /* combineReducers */])({
-    honey4: __WEBPACK_IMPORTED_MODULE_1__honey4_module__["b" /* default */]
+    honey5: __WEBPACK_IMPORTED_MODULE_1__honey5_module__["b" /* default */]
 }));
 
 
@@ -15471,12 +15471,12 @@ module.exports = __webpack_require__(135);
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_redux__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__honey4__ = __webpack_require__(219);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__honey5__ = __webpack_require__(219);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__module__ = __webpack_require__(93);
 
 
 
-/* harmony default export */ __webpack_exports__["a"] = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_react_redux__["b" /* connect */])(function (store) { return ({ state: store.honey4 }); }, function (dispatch) { return ({ actions: new __WEBPACK_IMPORTED_MODULE_2__module__["a" /* ActionDispatcher */](dispatch) }); })(__WEBPACK_IMPORTED_MODULE_1__honey4__["a" /* Honey4 */]);
+/* harmony default export */ __webpack_exports__["a"] = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_react_redux__["b" /* connect */])(function (store) { return ({ state: store.honey5 }); }, function (dispatch) { return ({ actions: new __WEBPACK_IMPORTED_MODULE_2__module__["a" /* ActionDispatcher */](dispatch) }); })(__WEBPACK_IMPORTED_MODULE_1__honey5__["a" /* Honey5 */]);
 
 
 /***/ }),
@@ -28954,7 +28954,7 @@ function symbolObservablePonyfill(root) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_immutable__ = __webpack_require__(59);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_immutable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_immutable__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Honey4; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Honey5; });
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -28967,24 +28967,30 @@ var __extends = (this && this.__extends) || (function () {
 })();
 
 
-var Honey4 = (function (_super) {
-    __extends(Honey4, _super);
-    function Honey4() {
+var Honey5 = (function (_super) {
+    __extends(Honey5, _super);
+    function Honey5() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    Honey4.prototype.render = function () {
+    Honey5.prototype.componentWillMount = function () {
+        this.gameState = "play";
+    };
+    Honey5.prototype.shouldComponentUpdate = function () {
+        return (this.gameState == "play") ? true : false;
+    };
+    Honey5.prototype.render = function () {
         var _this = this;
         this.cells = this.props.state.cells;
         this.step = this.props.state.step;
         return (__WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("div", null,
+            __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("h3", null,
+                "STEP: ",
+                this.props.state.step),
             __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("p", null,
-                __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("h3", null,
-                    "STEP: ",
-                    this.props.state.step),
                 __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("button", { onClick: function () { return _this.props.actions.undo(); } }, "UNDO")),
             __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("canvas", { ref: "myCanvas" })));
     };
-    Honey4.prototype.componentDidMount = function () {
+    Honey5.prototype.componentDidMount = function () {
         var _this = this;
         var TPI = 2 * Math.PI;
         var INTERVAL = 30;
@@ -29025,15 +29031,19 @@ var Honey4 = (function (_super) {
                 .reduce(function (a, b) { return Math.min(a, b); })) % 1000;
             var honeyX = idx % 20;
             var honeyY = Math.floor(idx / 20);
-            if (_this.props.state.step, _this.props.state.step % 2 == 1) {
-                _this.props.actions.red([honeyX, honeyY]);
+            if (_this.props.state.step % 2 == 1) {
+                if (_this.props.state.cells[honeyX][honeyY] != -1) {
+                    _this.props.actions.red([honeyX, honeyY]);
+                }
             }
             else {
-                _this.props.actions.blue([honeyX, honeyY]);
+                if (_this.props.state.cells[honeyX][honeyY] != 1) {
+                    _this.props.actions.blue([honeyX, honeyY]);
+                }
             }
         };
     };
-    Honey4.prototype.componentDidUpdate = function () {
+    Honey5.prototype.componentDidUpdate = function () {
         var _this = this;
         var TPI = 2 * Math.PI;
         var INTERVAL = 30;
@@ -29074,8 +29084,58 @@ var Honey4 = (function (_super) {
             else
                 Hex((x + 0.5) * INTERVAL, y * R * 3 / 2, R);
         });
+        var nextXY = function (x, y, op) {
+            switch (op) {
+                case "upperleft":
+                    return y % 2 ? [x, y - 1] : [x - 1, y - 1];
+                case "upperright":
+                    return y % 2 ? [x + 1, y - 1] : [x, y - 1];
+                case "left":
+                    return y % 2 ? [x - 1, y] : [x - 1, y];
+                case "right":
+                    return y % 2 ? [x + 1, y] : [x + 1, y];
+                case "lowerleft":
+                    return y % 2 ? [x, y + 1] : [x - 1, y + 1];
+                case "lowerright":
+                    return y % 2 ? [x + 1, y + 1] : [x, y + 1];
+                default:
+                    return [x, y];
+            }
+        };
+        var x = this.props.state.record[this.props.state.record.length - 1][0];
+        var y = this.props.state.record[this.props.state.record.length - 1][1];
+        var opNtimes = function (x, y, op, n) {
+            if (n < 0)
+                return 0;
+            var nextX = nextXY(x, y, op)[0];
+            var nextY = nextXY(x, y, op)[1];
+            if (nextX < 0 || nextX > 19 || nextY < 0 || nextY > 19)
+                return 0;
+            return opNtimes(nextX, nextY, op, n - 1) + _this.props.state.cells[nextX][nextY];
+        };
+        var scores = __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](0, 4).toArray()
+            .map(function (n) {
+            return [opNtimes(x, y, "upperleft", n) + _this.props.state.cells[x][y] + opNtimes(x, y, "lowerright", 4 - n),
+                opNtimes(x, y, "upperright", n) + _this.props.state.cells[x][y] + opNtimes(x, y, "lowerleft", 4 - n),
+                opNtimes(x, y, "left", n) + _this.props.state.cells[x][y] + opNtimes(x, y, "right", 4 - n),];
+        })
+            .reduce(function (a, b) { return a.concat(b); });
+        var redScore = scores.reduce(function (a, b) { return Math.min(a, b); });
+        var blueScore = scores.reduce(function (a, b) { return Math.max(a, b); });
+        ctx.fillStyle = "#000000";
+        ctx.font = "80pt Arial";
+        ctx.textAlign = "center";
+        if (redScore == -5) {
+            this.gameState = "GameOver";
+            ctx.fillText("Red win!", WIDTH / 2, HEIGHT / 2);
+            console.log(this.gameState);
+        }
+        if (blueScore == 5) {
+            this.gameState = "GameOver";
+            ctx.fillText("Blue win", WIDTH / 2, HEIGHT / 2);
+        }
     };
-    return Honey4;
+    return Honey5;
 }(__WEBPACK_IMPORTED_MODULE_0_react__["Component"]));
 
 
@@ -29120,14 +29180,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react_redux__ = __webpack_require__(55);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Store__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__honey4_Root__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__honey5_Root__ = __webpack_require__(97);
 
 
 
 
 
 __WEBPACK_IMPORTED_MODULE_1_react_dom__["render"](__WEBPACK_IMPORTED_MODULE_0_react__["createElement"](__WEBPACK_IMPORTED_MODULE_2_react_redux__["a" /* Provider */], { store: __WEBPACK_IMPORTED_MODULE_3__Store__["a" /* default */] },
-    __WEBPACK_IMPORTED_MODULE_0_react__["createElement"](__WEBPACK_IMPORTED_MODULE_4__honey4_Root__["a" /* default */], null)), document.getElementById('app'));
+    __WEBPACK_IMPORTED_MODULE_0_react__["createElement"](__WEBPACK_IMPORTED_MODULE_4__honey5_Root__["a" /* default */], null)), document.getElementById('app'));
 
 
 /***/ })
