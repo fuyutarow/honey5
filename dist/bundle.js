@@ -15342,6 +15342,7 @@ var ActionTypes = (function () {
 ActionTypes.INCREMENT = 'honey4/increment';
 ActionTypes.RED = 'honey4/red';
 ActionTypes.BLUE = 'honey4/blue';
+ActionTypes.UNDO = 'honey4/undo';
 var INITIAL_STATE = {
     num: 0,
     position: [0, 0],
@@ -15349,6 +15350,7 @@ var INITIAL_STATE = {
         return (__WEBPACK_IMPORTED_MODULE_0_immutable__["Range"](0, 20).toArray().map(function () { return 0; }));
     }),
     step: 0,
+    record: [[777, 777]],
 };
 function reducer(state, action) {
     if (state === void 0) { state = INITIAL_STATE; }
@@ -15362,14 +15364,31 @@ function reducer(state, action) {
                 .map(function (value, y) {
                 return (action.position[0] == x && action.position[1] == y) ? 1 : value;
             })); });
-            return Object.assign({}, state, { cells: redCells, step: state.step + 1 });
+            //const redRecord= Immutable.List.of(...state.record).push(action.position);
+            var redRecord = state.record;
+            redRecord.push(action.position);
+            return Object.assign({}, state, { cells: redCells, step: state.step + 1, record: redRecord });
         case ActionTypes.BLUE:
             var blueCells = state.cells
                 .map(function (line, x) { return (line
                 .map(function (value, y) {
                 return (action.position[0] == x && action.position[1] == y) ? -1 : value;
             })); });
-            return Object.assign({}, state, { cells: blueCells, step: state.step + 1 });
+            var blueRecord = state.record;
+            blueRecord.push(action.position);
+            return Object.assign({}, state, { cells: blueCells, step: state.step + 1, record: blueRecord });
+        case ActionTypes.UNDO:
+            if (state.step <= 0) {
+                return Object.assign({}, state, { step: 0 });
+            }
+            var undoRecord = state.record;
+            var lastRecord_1 = undoRecord.pop();
+            var undoCells = state.cells
+                .map(function (line, x) { return (line
+                .map(function (value, y) {
+                return (lastRecord_1[0] == x && lastRecord_1[1] == y) ? 0 : value;
+            })); });
+            return Object.assign({}, state, { cells: undoCells, step: state.step - 1, record: undoRecord });
         default:
             return state;
     }
@@ -15386,6 +15405,9 @@ var ActionDispatcher = (function () {
     };
     ActionDispatcher.prototype.blue = function (position) {
         this.dispatch({ type: ActionTypes.BLUE, position: position });
+    };
+    ActionDispatcher.prototype.undo = function () {
+        this.dispatch({ type: ActionTypes.UNDO });
     };
     return ActionDispatcher;
 }());
@@ -28951,13 +28973,15 @@ var Honey4 = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Honey4.prototype.render = function () {
+        var _this = this;
         this.cells = this.props.state.cells;
         this.step = this.props.state.step;
         return (__WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("div", null,
             __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("p", null,
                 __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("h3", null,
                     "STEP: ",
-                    this.props.state.step)),
+                    this.props.state.step),
+                __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("button", { onClick: function () { return _this.props.actions.undo(); } }, "UNDO")),
             __WEBPACK_IMPORTED_MODULE_0_react__["createElement"]("canvas", { ref: "myCanvas" })));
     };
     Honey4.prototype.componentDidMount = function () {
@@ -28966,6 +28990,7 @@ var Honey4 = (function (_super) {
         var INTERVAL = 30;
         var WIDTH = INTERVAL * 21;
         var HEIGHT = INTERVAL * 21;
+        var R = INTERVAL / (Math.cos(TPI / 12) * 2);
         var canvas = this.refs.myCanvas;
         var ctx = canvas.getContext('2d');
         canvas.width = WIDTH;
@@ -28981,37 +29006,30 @@ var Honey4 = (function (_super) {
             ctx.fill();
             ctx.stroke();
         };
-        var honeyComb = function (w, h, INTERVAL) {
-            __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](1, w / INTERVAL).toArray().map(function (x) {
-                __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](1, h / INTERVAL).toArray().map(function (y) {
-                    var r = INTERVAL / (Math.cos(TPI / 12) * 2);
-                    if (y % 2 == 1)
-                        Hex(x * INTERVAL, y * r * 3 / 2, r);
-                    else
-                        Hex(x * INTERVAL + INTERVAL / 2, y * r * 3 / 2, r);
-                });
-            });
-        };
-        honeyComb(WIDTH, HEIGHT, INTERVAL);
+        var honeyCombCoordinates = __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](0, 400).toArray()
+            .map(function (n) {
+            var x = n % 20 + 1;
+            var y = Math.floor(n / 20) + 1;
+            if (y % 2 == 1)
+                return [x * INTERVAL, y * R * 3 / 2];
+            else
+                return [(x + 0.5) * INTERVAL, y * R * 3 / 2];
+        });
+        honeyCombCoordinates
+            .map(function (a) { return Hex(a[0], a[1], R); });
         canvas.onmousedown = function (e) {
             // mouse2honey
-            var r = INTERVAL / (Math.cos(TPI / 12) * 2);
-            var aboutX = Math.floor(e.offsetX / INTERVAL);
-            var aboutY = Math.floor(e.offsetY * 2 / 3 / r);
-            var candidateCells = [[aboutX, aboutY],
-                [aboutX, aboutY + 1],
-                [aboutX + 1, aboutY],
-                [aboutX + 1, aboutY + 1]];
             var L2 = function (x, y) { return Math.sqrt(x * x + y * y); };
-            var honey = candidateCells[(candidateCells
-                .map(function (a) { return [a[0] * INTERVAL, a[1] * r * 3 / 2]; })
+            var idx = (honeyCombCoordinates
                 .map(function (a, idx) { return Math.floor(L2(a[0] - e.offsetX, a[1] - e.offsetY) * 1000) * 1000 + idx; })
-                .reduce(function (a, b) { return Math.min(a, b); })) % 1000];
+                .reduce(function (a, b) { return Math.min(a, b); })) % 1000;
+            var honeyX = idx % 20;
+            var honeyY = Math.floor(idx / 20);
             if (_this.props.state.step, _this.props.state.step % 2 == 1) {
-                _this.props.actions.red([honey[0] - 1, honey[1] - 1]);
+                _this.props.actions.red([honeyX, honeyY]);
             }
             else {
-                _this.props.actions.blue([honey[0] - 1, honey[1] - 1]);
+                _this.props.actions.blue([honeyX, honeyY]);
             }
         };
     };
@@ -29021,6 +29039,7 @@ var Honey4 = (function (_super) {
         var INTERVAL = 30;
         var WIDTH = INTERVAL * 21;
         var HEIGHT = INTERVAL * 21;
+        var R = INTERVAL / (Math.cos(TPI / 12) * 2);
         var canvas = this.refs.myCanvas;
         var ctx = canvas.getContext('2d');
         var Hex = function (x, y, r) {
@@ -29033,31 +29052,28 @@ var Honey4 = (function (_super) {
             ctx.fill();
             ctx.stroke();
         };
-        var honeyComb = function (w, h, INTERVAL) {
-            __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](1, w / INTERVAL).toArray().map(function (x) {
-                __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](1, h / INTERVAL).toArray().map(function (y) {
-                    switch (_this.props.state.cells[x - 1][y - 1]) {
-                        case 0:
-                            ctx.fillStyle = '#ffff22';
-                            break;
-                        case 1:
-                            ctx.fillStyle = '#2222ff';
-                            break;
-                        case -1:
-                            ctx.fillStyle = '#ff2222';
-                            break;
-                        default: ctx.fillStyle = '#ffffff';
-                    }
-                    ;
-                    var r = INTERVAL / (Math.cos(TPI / 12) * 2);
-                    if (y % 2 == 1)
-                        Hex(x * INTERVAL, y * r * 3 / 2, r);
-                    else
-                        Hex(x * INTERVAL + INTERVAL / 2, y * r * 3 / 2, r);
-                });
-            });
-        };
-        honeyComb(WIDTH, HEIGHT, INTERVAL);
+        var honeyComb = __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](0, 400).toArray()
+            .map(function (n) {
+            var x = n % 20 + 1;
+            var y = Math.floor(n / 20) + 1;
+            switch (_this.props.state.cells[x - 1][y - 1]) {
+                case 0:
+                    ctx.fillStyle = '#ffff22';
+                    break;
+                case 1:
+                    ctx.fillStyle = '#2222ff';
+                    break;
+                case -1:
+                    ctx.fillStyle = '#ff2222';
+                    break;
+                default: ctx.fillStyle = '#ffffff';
+            }
+            ;
+            if (y % 2 == 1)
+                Hex(x * INTERVAL, y * R * 3 / 2, R);
+            else
+                Hex((x + 0.5) * INTERVAL, y * R * 3 / 2, R);
+        });
     };
     return Honey4;
 }(__WEBPACK_IMPORTED_MODULE_0_react__["Component"]));

@@ -4,6 +4,7 @@ export interface Honey4State {
   num: number;
   cells: number[][];
   step: number;
+  record: number[][];
 }
 
 interface Honey4Action {
@@ -16,6 +17,7 @@ export class ActionTypes {
   static INCREMENT = 'honey4/increment';
   static RED = 'honey4/red';
   static BLUE = 'honey4/blue';
+  static UNDO = 'honey4/undo';
 }
 
 const INITIAL_STATE =  {
@@ -24,6 +26,7 @@ const INITIAL_STATE =  {
   cells: Immutable.Range(0,20).toArray().map( () =>
     ( Immutable.Range(0,20).toArray().map( () => 0 )) ),
   step: 0,
+  record: [[777,777]],
 };
 
 export default function reducer(
@@ -40,14 +43,31 @@ export default function reducer(
         .map( (line, x) => ( line
           .map( (value, y) => {
             return (action.position[0] == x && action.position[1] == y)? 1: value;})));
-      return Object.assign({}, state, { cells: redCells, step: state.step + 1 });
+      //const redRecord= Immutable.List.of(...state.record).push(action.position);
+      let redRecord = state.record;
+      redRecord.push(action.position);
+      return Object.assign({}, state, { cells: redCells, step: state.step + 1, record: redRecord});
 
     case ActionTypes.BLUE:
       const blueCells = state.cells
         .map( (line, x) => ( line
           .map( (value, y) => {
             return (action.position[0] == x && action.position[1] == y)? -1: value;})));
-      return Object.assign({}, state, { cells: blueCells, step: state.step + 1 });
+      let blueRecord = state.record;
+      blueRecord.push(action.position);
+      return Object.assign({}, state, { cells: blueCells, step: state.step + 1, record: blueRecord });
+
+    case ActionTypes.UNDO:
+      if (state.step<=0){
+        return Object.assign({}, state, { step: 0 });
+      }
+      let undoRecord = state.record;
+      const lastRecord = undoRecord.pop();
+      const undoCells = state.cells
+        .map( (line, x) => ( line
+          .map( (value, y) => {
+            return (lastRecord[0] == x && lastRecord[1] == y)? 0: value;})));
+      return Object.assign({}, state, { cells: undoCells, step: state.step -1 , record: undoRecord });
 
     default:
       return state;
@@ -60,12 +80,15 @@ export class ActionDispatcher {
     this.dispatch = dispatch
   }
   increment(amount: number) {
-    this.dispatch({ type: ActionTypes.INCREMENT, amount: amount })
+    this.dispatch({ type: ActionTypes.INCREMENT, amount: amount });
   }
   red( position: number[] ){
     this.dispatch({ type: ActionTypes.RED, position: position });
   }
   blue( position: number[] ){
     this.dispatch({ type: ActionTypes.BLUE, position: position });
+  }
+  undo(){
+    this.dispatch({ type: ActionTypes.UNDO });
   }
 }

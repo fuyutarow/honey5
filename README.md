@@ -13,6 +13,7 @@ https://sktnkysh.github.io/honey4/
 ## Requirement
 
 - NodeJS 5.X+
+- Typings 2.x+
 
 ## Install
 
@@ -30,4 +31,4 @@ typings install
 
 access localhost:8000/dist
 <br>
-Enjoy honeycobm:honeybee::honeybee:
+Enjoy honeycomb:honeybee::honeybee:

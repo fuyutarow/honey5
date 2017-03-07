@@ -19,7 +19,10 @@ export class Honey4 extends React.Component<Props, {}> {
 
     return (
       <div>
-        <p><h3>STEP: { this.props.state.step }</h3></p>
+        <p>
+          <h3>STEP: { this.props.state.step }</h3>
+          <button onClick={ () => this.props.actions.undo() }>UNDO</button>
+        </p>
         <canvas ref="myCanvas"/>
       </div>
     );
@@ -30,7 +33,7 @@ export class Honey4 extends React.Component<Props, {}> {
     const INTERVAL = 30;
     const WIDTH = INTERVAL*21;
     const HEIGHT = INTERVAL*21;
-
+    const R = INTERVAL/(Math.cos(TPI/12)*2);
     const canvas = this.refs.myCanvas as HTMLCanvasElement;
     const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
 
@@ -48,39 +51,31 @@ export class Honey4 extends React.Component<Props, {}> {
       ctx.stroke();
     };
 
-    const honeyComb = (w:number, h:number, INTERVAL:number) => {
-      Immutable.Range( 1, w/INTERVAL ).toArray().map( (x) => {
-        Immutable.Range( 1, h/INTERVAL ).toArray().map( (y) => {
-          const r = INTERVAL/(Math.cos(TPI/12)*2);
-          if (y%2==1) Hex( x*INTERVAL, y*r*3/2, r);
-          else Hex( x*INTERVAL + INTERVAL/2, y*r*3/2, r );
-    })})};
-    honeyComb(WIDTH, HEIGHT, INTERVAL);
+    const honeyCombCoordinates =
+      Immutable.Range(0,400).toArray()
+        .map( n => {
+          const x = n%20+1;
+          const y = Math.floor(n/20)+1;
+          if (y%2==1) return [x*INTERVAL, y*R*3/2];
+          else return [(x+0.5)*INTERVAL , y*R*3/2];
+        })
+
+    honeyCombCoordinates
+      .map( a => Hex(a[0],a[1],R) )
 
     canvas.onmousedown = e => {
       // mouse2honey
-      const r = INTERVAL/(Math.cos(TPI/12)*2);
-      let aboutX = Math.floor(e.offsetX/INTERVAL);
-      let aboutY = Math.floor(e.offsetY*2/3/r);
-
-      const candidateCells =
-        [ [aboutX, aboutY],
-          [aboutX, aboutY+1],
-          [aboutX+1, aboutY],
-          [aboutX+1, aboutY+1] ]
-
       const L2 = (x:number,y:number) => Math.sqrt( x*x + y*y );
-      const honey = candidateCells[
-          (candidateCells
-            .map( a => [a[0]*INTERVAL, a[1]*r*3/2])
-            .map( (a,idx) => Math.floor( L2( a[0]-e.offsetX, a[1]-e.offsetY )*1000 )*1000 +idx )
-            .reduce( (a,b) => Math.min(a, b) )
-          )%1000]
-
+      const idx = (honeyCombCoordinates
+        .map( (a,idx) => Math.floor( L2( a[0]-e.offsetX, a[1]-e.offsetY )*1000 )*1000 +idx )
+        .reduce( (a,b) => Math.min(a, b) )
+      )%1000
+      const honeyX = idx%20;
+      const honeyY = Math.floor(idx/20);
       if( this.props.state.step,this.props.state.step%2==1 ){
-        this.props.actions.red([honey[0]-1,honey[1]-1]);
+        this.props.actions.red([honeyX, honeyY]);
       }else{
-        this.props.actions.blue([honey[0]-1,honey[1]-1]);
+        this.props.actions.blue([honeyX, honeyY]);
       }
     }
   }
@@ -90,7 +85,7 @@ export class Honey4 extends React.Component<Props, {}> {
     const INTERVAL = 30;
     const WIDTH = INTERVAL*21;
     const HEIGHT = INTERVAL*21;
-
+    const R = INTERVAL/(Math.cos(TPI/12)*2);
     const canvas = this.refs.myCanvas as HTMLCanvasElement;
     const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
 
@@ -104,20 +99,20 @@ export class Honey4 extends React.Component<Props, {}> {
       ctx.stroke();
     };
 
-    const honeyComb = (w:number, h:number, INTERVAL:number) => {
-      Immutable.Range( 1, w/INTERVAL ).toArray().map( (x) => {
-        Immutable.Range( 1, h/INTERVAL ).toArray().map( (y) => {
+
+    const honeyComb =
+      Immutable.Range(0,400).toArray()
+        .map( n => {
+          const x = n%20+1;
+          const y = Math.floor(n/20)+1;
           switch( this.props.state.cells[x-1][y-1] ){
             case 0: ctx.fillStyle = '#ffff22';break;
             case 1: ctx.fillStyle = '#2222ff';break;
             case -1: ctx.fillStyle = '#ff2222';break;
             default: ctx.fillStyle = '#ffffff';
           };
-          const r = INTERVAL/(Math.cos(TPI/12)*2);
-          if (y%2==1) Hex( x*INTERVAL, y*r*3/2, r);
-          else Hex( x*INTERVAL + INTERVAL/2, y*r*3/2, r );
-    })})};
-    honeyComb(WIDTH, HEIGHT, INTERVAL);
-
+          if (y%2==1) Hex( x*INTERVAL, y*R*3/2, R );
+          else Hex( (x+0.5)*INTERVAL , y*R*3/2, R );
+        })
   }
 }
