@@ -1,16 +1,15 @@
 import * as Immutable from 'immutable';
 
 export interface Honey5State {
-  num: number;
-  cells: number[][];
+  cells: number[];
   step: number;
-  record: number[][];
+  record: number[];
 }
 
   interface Honey5Action {
   type: string;
   amount?: number;
-  position?: number[];
+  position?: number;
 }
 
 export class ActionTypes {
@@ -21,12 +20,10 @@ export class ActionTypes {
 }
 
 const INITIAL_STATE =  {
-  num: 0,
-  position: [0,0],
-  cells: Immutable.Range(0,20).toArray().map( () =>
-    ( Immutable.Range(0,20).toArray().map( () => 0 )) ),
+  position: 0,
+  cells: Immutable.Range(0,400).toArray().map( () => 0 ),
   step: 0,
-  record: [[777,777]],
+  record: [0],
 };
 
 export default function reducer(
@@ -34,15 +31,11 @@ export default function reducer(
   action: Honey5Action
 ): Honey5State {
   switch (action.type) {
-    case ActionTypes.INCREMENT:
-      const newNum = state.num + action.amount
-      return Object.assign({}, state, { num: newNum });
 
     case ActionTypes.RED:
       const redCells = state.cells
-        .map( (line, x) => ( line
-          .map( (value, y) => {
-            return (action.position[0] == x && action.position[1] == y)? 1: value;})));
+        .map( ( value,idx ) =>
+          ( idx%20 == action.position%20 && Math.floor(idx/20) == Math.floor(action.position/20) )? 1: value);
       //const redRecord= Immutable.List.of(...state.record).push(action.position);
       let redRecord = state.record;
       redRecord.push(action.position);
@@ -50,9 +43,8 @@ export default function reducer(
 
     case ActionTypes.BLUE:
       const blueCells = state.cells
-        .map( (line, x) => ( line
-          .map( (value, y) => {
-            return (action.position[0] == x && action.position[1] == y)? -1: value;})));
+        .map( ( value,idx ) =>
+          ( idx%20 == action.position%20 && Math.floor(idx/20) == Math.floor(action.position/20) )? -1: value);
       let blueRecord = state.record;
       blueRecord.push(action.position);
       return Object.assign({}, state, { cells: blueCells, step: state.step + 1, record: blueRecord });
@@ -64,9 +56,8 @@ export default function reducer(
       let undoRecord = state.record;
       const lastRecord = undoRecord.pop();
       const undoCells = state.cells
-        .map( (line, x) => ( line
-          .map( (value, y) => {
-            return (lastRecord[0] == x && lastRecord[1] == y)? 0: value;})));
+        .map( ( value,idx ) =>
+          ( idx%20 == lastRecord%20 && Math.floor(idx/20) == Math.floor(lastRecord/20) )? 0: value);
       return Object.assign({}, state, { cells: undoCells, step: state.step -1 , record: undoRecord });
 
     default:
@@ -78,9 +69,6 @@ export class ActionDispatcher {
   dispatch: (action: any) => any;
   constructor(dispatch: (action: any) => any) {
     this.dispatch = dispatch
-  }
-  increment(amount: number) {
-    this.dispatch({ type: ActionTypes.INCREMENT, amount: amount });
   }
   red( position: number[] ){
     this.dispatch({ type: ActionTypes.RED, position: position });
