@@ -6,8 +6,8 @@ import * as Immutable from 'immutable';
 const TPI = 2*Math.PI;
 const INTERVAL = 30;
 const R = INTERVAL/(Math.cos(TPI/12)*2);
-const WIDTH = INTERVAL*21;
-const HEIGHT = INTERVAL*21;
+const W = 19;
+const H = 19;
 
 interface Props {
   state: Honey5State;
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export class Honey5 extends React.Component<Props, {}> {
-  cells: number[]; // p == x + y*20
+  cells: number[]; // p == x + y*W
   step: number;
   gameState: string;
 
@@ -44,8 +44,8 @@ export class Honey5 extends React.Component<Props, {}> {
     const canvas = this.refs.myCanvas as HTMLCanvasElement;
     const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
 
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
+    canvas.width = (W+1)*INTERVAL;
+    canvas.height = (W+1)*INTERVAL;
     ctx.fillStyle = '#ffff33';
 
     const Hex = (x:number, y:number, r:number) => {
@@ -58,10 +58,10 @@ export class Honey5 extends React.Component<Props, {}> {
       ctx.stroke();
     };
 
-    const honeyCombCoordinates = Immutable.Range(0,400).toArray()
+    const honeyCombCoordinates = Immutable.Range(0,W*H).toArray()
       .map( n => {
-        const x = n%20+1;
-        const y = Math.floor(n/20)+1;
+        const x = n%W+1;
+        const y = Math.floor(n/W)+1;
         return { x: y%2==0? (x+0.5)*INTERVAL : x*INTERVAL , y: y*R*3/2 };})
 
     honeyCombCoordinates
@@ -107,7 +107,7 @@ export class Honey5 extends React.Component<Props, {}> {
 
     // for click
     const honeyComb =
-      Immutable.Range(0,400).toArray()
+      Immutable.Range(0,W*H).toArray()
         .map( p => {
           switch( this.props.state.cells[p] ){
             case 0: ctx.fillStyle = '#ffff22';break;
@@ -115,8 +115,8 @@ export class Honey5 extends React.Component<Props, {}> {
             case -1: ctx.fillStyle = '#2222ff';break;
             default: ctx.fillStyle = '#ffffff';
           };
-          const x = p%20 + 1;
-          const y = Math.floor(p/20) + 1;
+          const x = p%W + 1;
+          const y = Math.floor(p/W) + 1;
           Hex( y%2==0? (x+0.5)*INTERVAL : x*INTERVAL, y*R*3/2, R );
         })
 
@@ -135,9 +135,9 @@ export class Honey5 extends React.Component<Props, {}> {
 
     let opNtimes:any = ( p:number, op:string , n:number) => {
       if( n<0 ) return 0;
-      const nextX = nextXY( p%20, Math.floor(p/20) ,op)[0];
-      const nextY = nextXY( p%20, Math.floor(p/20) ,op)[1];
-      const nextP = nextX + nextY*20;
+      const nextX = nextXY( p%W, Math.floor(p/W) ,op)[0];
+      const nextY = nextXY( p%W, Math.floor(p/W) ,op)[1];
+      const nextP = nextX + nextY*W;
       if( nextX<0 || nextX>19 || nextY<0|| nextY>19 ) return 0;
       return opNtimes(nextP,op,n-1) + this.props.state.cells[nextP];
     }
@@ -156,6 +156,9 @@ export class Honey5 extends React.Component<Props, {}> {
     ctx.fillStyle = "#000000";
     ctx.font = "80pt Arial";
     ctx.textAlign = "center";
+
+    const WIDTH = (W+1)*INTERVAL;
+    const HEIGHT = (H+1)*INTERVAL;
     if( redScore == 5 ){
       this.gameState = "GameOver";
       ctx.fillText("Red win!", WIDTH/2, HEIGHT/2);
