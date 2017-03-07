@@ -1,5 +1,8 @@
 import * as Immutable from 'immutable';
 
+const W = 19;
+const H = 19;
+
 export interface Honey5State {
   cells: number[];
   step: number;
@@ -21,7 +24,7 @@ export class ActionTypes {
 
 const INITIAL_STATE =  {
   position: 0,
-  cells: Immutable.Range(0,400).toArray().map( () => 0 ),
+  cells: Immutable.Range(0,W*H).toArray().map( () => 0 ),
   step: 0,
   record: [0],
 };
@@ -35,7 +38,7 @@ export default function reducer(
     case ActionTypes.RED:
       const redCells = state.cells
         .map( ( value,idx ) =>
-          ( idx%20 == action.position%20 && Math.floor(idx/20) == Math.floor(action.position/20) )? 1: value);
+          ( idx%W == action.position%W && Math.floor(idx/W) == Math.floor(action.position/W) )? 1: value);
       //const redRecord= Immutable.List.of(...state.record).push(action.position);
       let redRecord = state.record;
       redRecord.push(action.position);
@@ -44,7 +47,7 @@ export default function reducer(
     case ActionTypes.BLUE:
       const blueCells = state.cells
         .map( ( value,idx ) =>
-          ( idx%20 == action.position%20 && Math.floor(idx/20) == Math.floor(action.position/20) )? -1: value);
+          ( idx%W == action.position%W && Math.floor(idx/W) == Math.floor(action.position/W) )? -1: value);
       let blueRecord = state.record;
       blueRecord.push(action.position);
       return Object.assign({}, state, { cells: blueCells, step: state.step + 1, record: blueRecord });
@@ -57,7 +60,7 @@ export default function reducer(
       const lastRecord = undoRecord.pop();
       const undoCells = state.cells
         .map( ( value,idx ) =>
-          ( idx%20 == lastRecord%20 && Math.floor(idx/20) == Math.floor(lastRecord/20) )? 0: value);
+          ( idx%W == lastRecord%W && Math.floor(idx/W) == Math.floor(lastRecord/W) )? 0: value);
       return Object.assign({}, state, { cells: undoCells, step: state.step -1 , record: undoRecord });
 
     default:
