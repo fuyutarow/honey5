@@ -32,3 +32,10 @@ typings install
 access localhost:8000/dist
 <br>
 Enjoy honeycomb:honeybee::honeybee:
+
+## How to play
+
+Five in line<br>
+This is a board game for two players. Each players' goal is to make a row of bees.<br>
+Red plays first, and you are blue player.
+Let's <a href="https://sktnkysh.github.io/honey5/">play</a>!

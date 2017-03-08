@@ -38,7 +38,7 @@ export default function reducer(
     case ActionTypes.RED:
       const redCells = state.cells
         .map( ( value,idx ) =>
-          ( idx%W == action.position%W && Math.floor(idx/W) == Math.floor(action.position/W) )? 1: value);
+          ( idx%W == action.position%W && Math.floor(idx/W) == Math.floor(action.position/W) )? 1: value );
       //const redRecord= Immutable.List.of(...state.record).push(action.position);
       let redRecord = state.record;
       redRecord.push(action.position);
@@ -47,7 +47,7 @@ export default function reducer(
     case ActionTypes.BLUE:
       const blueCells = state.cells
         .map( ( value,idx ) =>
-          ( idx%W == action.position%W && Math.floor(idx/W) == Math.floor(action.position/W) )? -1: value);
+          ( idx%W == action.position%W && Math.floor(idx/W) == Math.floor(action.position/W) )? -1: value );
       let blueRecord = state.record;
       blueRecord.push(action.position);
       return Object.assign({}, state, { cells: blueCells, step: state.step + 1, record: blueRecord });
@@ -58,10 +58,13 @@ export default function reducer(
       }
       let undoRecord = state.record;
       const lastRecord = undoRecord.pop();
+      const boobyRecord = undoRecord.pop();
       const undoCells = state.cells
-        .map( ( value,idx ) =>
-          ( idx%W == lastRecord%W && Math.floor(idx/W) == Math.floor(lastRecord/W) )? 0: value);
-      return Object.assign({}, state, { cells: undoCells, step: state.step -1 , record: undoRecord });
+      .map( ( value,idx ) =>
+        ( idx%W == lastRecord%W && Math.floor(idx/W) == Math.floor(lastRecord/W) )? 0: value )
+      .map( ( value,idx ) =>
+        ( idx%W == boobyRecord%W && Math.floor(idx/W) == Math.floor(boobyRecord/W) )? 0: value );
+      return Object.assign({}, state, { cells: undoCells, step: state.step - 2 , record: undoRecord });
 
     default:
       return state;
@@ -73,10 +76,10 @@ export class ActionDispatcher {
   constructor(dispatch: (action: any) => any) {
     this.dispatch = dispatch
   }
-  red( position: number[] ){
+  red( position: number ){
     this.dispatch({ type: ActionTypes.RED, position: position });
   }
-  blue( position: number[] ){
+  blue( position: number ){
     this.dispatch({ type: ActionTypes.BLUE, position: position });
   }
   undo(){

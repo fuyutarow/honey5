@@ -2,12 +2,22 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Honey5State, ActionDispatcher } from './module';
 import * as Immutable from 'immutable';
+import Queenbee from './honey5-ai';
+const Bee = new Queenbee;
 
 const TPI = 2*Math.PI;
 const INTERVAL = 30;
 const R = INTERVAL/(Math.cos(TPI/12)*2);
 const W = 19;
 const H = 19;
+
+const p2honeyXY = ( p:number ) => { return { x:p%W, y:Math.floor(p/W) }};
+const hoenyXY2mouseXY = ( x:number, y:number ) => {
+  return { x: y%2==0? (x+1)*INTERVAL : (x+1.5)*INTERVAL , y: (y+1)*R*3/2 }}
+const p2mouseXY = ( p:number ) => {
+  const mouseXY = hoenyXY2mouseXY( p2honeyXY(p).x, p2honeyXY(p).y )
+  return { x: mouseXY.x ,y: mouseXY.y}}
+const L2 = (x:number,y:number) => Math.sqrt( x*x + y*y );
 
 interface Props {
   state: Honey5State;
@@ -21,7 +31,7 @@ export class Honey5 extends React.Component<Props, {}> {
 
   componentWillMount(){
     this.gameState = "play";
-    this.props.actions.red([9+9*W]);
+    this.props.actions.red( 9+9*W );
   }
 
   shouldComponentUpdate(){
@@ -60,10 +70,7 @@ export class Honey5 extends React.Component<Props, {}> {
     };
 
     const honeyCombCoordinates = Immutable.Range(0,W*H).toArray()
-      .map( n => {
-        const x = n%W+1;
-        const y = Math.floor(n/W)+1;
-        return { x: y%2==0? (x+0.5)*INTERVAL : x*INTERVAL , y: y*R*3/2 };})
+      .map( n => p2mouseXY(n) )
 
     honeyCombCoordinates
       .map( a => Hex(a.x,a.y,R) )
@@ -80,14 +87,8 @@ export class Honey5 extends React.Component<Props, {}> {
         return p;
       }
       const honeyP = mouse2honey( e.offsetX, e.offsetY );
-      if( this.props.state.step%2 == 0 ){
-        if( this.props.state.cells[honeyP] != -1 ){
-          this.props.actions.red([honeyP]);
-        }
-      }else{
-        if( this.props.state.cells[honeyP] != 1 ){
-          this.props.actions.blue([honeyP]);
-        }
+      if( this.props.state.step%2 == 1 && this.props.state.cells[honeyP] == 0 ){
+          this.props.actions.blue( honeyP );
       }
     }
   }
@@ -107,19 +108,15 @@ export class Honey5 extends React.Component<Props, {}> {
     };
 
     // for click
-    const honeyComb =
-      Immutable.Range(0,W*H).toArray()
-        .map( p => {
-          switch( this.props.state.cells[p] ){
-            case 0: ctx.fillStyle = '#ffff22';break;
-            case 1: ctx.fillStyle = '#ff2222';break;
-            case -1: ctx.fillStyle = '#2222ff';break;
-            default: ctx.fillStyle = '#ffffff';
-          };
-          const x = p%W + 1;
-          const y = Math.floor(p/W) + 1;
-          Hex( y%2==0? (x+0.5)*INTERVAL : x*INTERVAL, y*R*3/2, R );
-        })
+    const honeyComb = Immutable.Range(0,W*H).toArray()
+      .map( p => {
+        switch( this.props.state.cells[p] ){
+          case 0: ctx.fillStyle = '#ffff22';break;
+          case 1: ctx.fillStyle = '#ff2222';break;
+          case -1: ctx.fillStyle = '#2222ff';break;
+          default: ctx.fillStyle = '#ffffff';
+        };
+        Hex( p2mouseXY(p).x, p2mouseXY(p).y , R ) });
 
 //*****************************************************************************
 // for termial
@@ -136,8 +133,8 @@ export class Honey5 extends React.Component<Props, {}> {
 
     let opNtimes:any = ( p:number, op:string , n:number) => {
       if( n<0 ) return 0;
-      const nextX = nextXY( p%W, Math.floor(p/W) ,op)[0];
-      const nextY = nextXY( p%W, Math.floor(p/W) ,op)[1];
+      const nextX = nextXY( p2honeyXY(p).x, p2honeyXY(p).y, op )[0];
+      const nextY = nextXY( p2honeyXY(p).x, p2honeyXY(p).y, op )[1];
       const nextP = nextX + nextY*W;
       if( nextX<0 || nextX>19 || nextY<0|| nextY>19 ) return 0;
       return opNtimes(nextP,op,n-1) + this.props.state.cells[nextP];
@@ -168,6 +165,14 @@ export class Honey5 extends React.Component<Props, {}> {
     if( blueScore == -5 ){
       this.gameState = "GameOver";
       ctx.fillText("Blue win", WIDTH/2, HEIGHT/2);
+    }
+
+// for AI
+    if( this.props.state.step%2 == 0 ){
+      Bee.readCells( this.props.state.cells );
+      const p = Bee.neighbor();
+      const lastRecord = this.props.state.record[this.props.state.record.length-1];
+      setTimeout( () => this.props.actions.red( p ) , 1000);
     }
 
   }
