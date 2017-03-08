@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 221);
+/******/ 	return __webpack_require__(__webpack_require__.s = 222);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -15333,6 +15333,8 @@ function warning(message) {
 /* harmony export (immutable) */ __webpack_exports__["b"] = reducer;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ActionDispatcher; });
 
+var W = 19;
+var H = 19;
 var ActionTypes = (function () {
     function ActionTypes() {
     }
@@ -15344,36 +15346,28 @@ ActionTypes.RED = 'honey5/red';
 ActionTypes.BLUE = 'honey5/blue';
 ActionTypes.UNDO = 'honey5/undo';
 var INITIAL_STATE = {
-    num: 0,
-    position: [0, 0],
-    cells: __WEBPACK_IMPORTED_MODULE_0_immutable__["Range"](0, 20).toArray().map(function () {
-        return (__WEBPACK_IMPORTED_MODULE_0_immutable__["Range"](0, 20).toArray().map(function () { return 0; }));
-    }),
+    position: 0,
+    cells: __WEBPACK_IMPORTED_MODULE_0_immutable__["Range"](0, W * H).toArray().map(function () { return 0; }),
     step: 0,
-    record: [[777, 777]],
+    record: [0],
 };
 function reducer(state, action) {
     if (state === void 0) { state = INITIAL_STATE; }
     switch (action.type) {
-        case ActionTypes.INCREMENT:
-            var newNum = state.num + action.amount;
-            return Object.assign({}, state, { num: newNum });
         case ActionTypes.RED:
             var redCells = state.cells
-                .map(function (line, x) { return (line
-                .map(function (value, y) {
-                return (action.position[0] == x && action.position[1] == y) ? 1 : value;
-            })); });
+                .map(function (value, idx) {
+                return (idx % W == action.position % W && Math.floor(idx / W) == Math.floor(action.position / W)) ? 1 : value;
+            });
             //const redRecord= Immutable.List.of(...state.record).push(action.position);
             var redRecord = state.record;
             redRecord.push(action.position);
             return Object.assign({}, state, { cells: redCells, step: state.step + 1, record: redRecord });
         case ActionTypes.BLUE:
             var blueCells = state.cells
-                .map(function (line, x) { return (line
-                .map(function (value, y) {
-                return (action.position[0] == x && action.position[1] == y) ? -1 : value;
-            })); });
+                .map(function (value, idx) {
+                return (idx % W == action.position % W && Math.floor(idx / W) == Math.floor(action.position / W)) ? -1 : value;
+            });
             var blueRecord = state.record;
             blueRecord.push(action.position);
             return Object.assign({}, state, { cells: blueCells, step: state.step + 1, record: blueRecord });
@@ -15383,12 +15377,15 @@ function reducer(state, action) {
             }
             var undoRecord = state.record;
             var lastRecord_1 = undoRecord.pop();
+            var boobyRecord_1 = undoRecord.pop();
             var undoCells = state.cells
-                .map(function (line, x) { return (line
-                .map(function (value, y) {
-                return (lastRecord_1[0] == x && lastRecord_1[1] == y) ? 0 : value;
-            })); });
-            return Object.assign({}, state, { cells: undoCells, step: state.step - 1, record: undoRecord });
+                .map(function (value, idx) {
+                return (idx % W == lastRecord_1 % W && Math.floor(idx / W) == Math.floor(lastRecord_1 / W)) ? 0 : value;
+            })
+                .map(function (value, idx) {
+                return (idx % W == boobyRecord_1 % W && Math.floor(idx / W) == Math.floor(boobyRecord_1 / W)) ? 0 : value;
+            });
+            return Object.assign({}, state, { cells: undoCells, step: state.step - 2, record: undoRecord });
         default:
             return state;
     }
@@ -15397,9 +15394,6 @@ var ActionDispatcher = (function () {
     function ActionDispatcher(dispatch) {
         this.dispatch = dispatch;
     }
-    ActionDispatcher.prototype.increment = function (amount) {
-        this.dispatch({ type: ActionTypes.INCREMENT, amount: amount });
-    };
     ActionDispatcher.prototype.red = function (position) {
         this.dispatch({ type: ActionTypes.RED, position: position });
     };
@@ -15471,7 +15465,7 @@ module.exports = __webpack_require__(135);
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_redux__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__honey5__ = __webpack_require__(219);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__honey5__ = __webpack_require__(220);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__module__ = __webpack_require__(93);
 
 
@@ -28914,7 +28908,7 @@ if (typeof self !== 'undefined') {
 
 var result = (0, _ponyfill2['default'])(root);
 exports['default'] = result;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(94), __webpack_require__(220)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(94), __webpack_require__(221)(module)))
 
 /***/ }),
 /* 218 */
@@ -28950,10 +28944,68 @@ function symbolObservablePonyfill(root) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+var TPI = 2 * Math.PI;
+var INTERVAL = 30;
+var R = INTERVAL / (Math.cos(TPI / 12) * 2);
+var W = 19;
+var H = 19;
+var p2honeyXY = function (p) { return { x: p % W, y: Math.floor(p / W) }; };
+var hoenyXY2mouseXY = function (x, y) {
+    return { x: y % 2 == 0 ? (x + 1) * INTERVAL : (x + 1.5) * INTERVAL, y: (y + 1) * R * 3 / 2 };
+};
+var p2mouseXY = function (p) {
+    var mouseXY = hoenyXY2mouseXY(p2honeyXY(p).x, p2honeyXY(p).y);
+    return { x: mouseXY.x, y: mouseXY.y };
+};
+var L2 = function (x, y) { return Math.sqrt(x * x + y * y); };
+var Queenbee = (function () {
+    function Queenbee() {
+    }
+    Queenbee.prototype.readCells = function (cells) {
+        this.cells = cells;
+    };
+    Queenbee.prototype.rend = function () {
+        var index4yellowCells = this.cells
+            .map(function (value, idx) { return { p: idx, v: value }; })
+            .filter(function (a) { return a.v == 0; })
+            .map(function (a) { return a.p; });
+        return index4yellowCells[Math.floor(Math.random() * index4yellowCells.length)];
+    };
+    Queenbee.prototype.neighbor = function () {
+        var index4yellowCells = this.cells
+            .map(function (value, idx) { return { p: idx, v: value }; })
+            .filter(function (a) { return a.v == 0; })
+            .map(function (a) { return a.p; });
+        var index4redCells = this.cells
+            .map(function (value, idx) { return { p: idx, v: value }; })
+            .filter(function (a) { return a.v == 1; })
+            .map(function (a) { return a.p; });
+        var neighborhoods = index4yellowCells
+            .map(function (a) {
+            var d = index4redCells
+                .map(function (b) { return L2(p2mouseXY(a).x - p2mouseXY(b).x, p2mouseXY(a).y - p2mouseXY(b).y); })
+                .reduce(function (s, t) { return Math.min(s, t); });
+            return { id: a, d: d };
+        })
+            .filter(function (a) { return a.d < 2 * R; })
+            .map(function (a) { return a.id; });
+        return neighborhoods[Math.floor(Math.random() * neighborhoods.length)];
+    };
+    return Queenbee;
+}());
+/* harmony default export */ __webpack_exports__["a"] = Queenbee;
+
+
+/***/ }),
+/* 220 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_immutable__ = __webpack_require__(59);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_immutable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_immutable__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__honey5_ai__ = __webpack_require__(219);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Honey5; });
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -28967,6 +29019,22 @@ var __extends = (this && this.__extends) || (function () {
 })();
 
 
+
+var Bee = new __WEBPACK_IMPORTED_MODULE_2__honey5_ai__["a" /* default */];
+var TPI = 2 * Math.PI;
+var INTERVAL = 30;
+var R = INTERVAL / (Math.cos(TPI / 12) * 2);
+var W = 19;
+var H = 19;
+var p2honeyXY = function (p) { return { x: p % W, y: Math.floor(p / W) }; };
+var hoenyXY2mouseXY = function (x, y) {
+    return { x: y % 2 == 0 ? (x + 1) * INTERVAL : (x + 1.5) * INTERVAL, y: (y + 1) * R * 3 / 2 };
+};
+var p2mouseXY = function (p) {
+    var mouseXY = hoenyXY2mouseXY(p2honeyXY(p).x, p2honeyXY(p).y);
+    return { x: mouseXY.x, y: mouseXY.y };
+};
+var L2 = function (x, y) { return Math.sqrt(x * x + y * y); };
 var Honey5 = (function (_super) {
     __extends(Honey5, _super);
     function Honey5() {
@@ -28974,6 +29042,7 @@ var Honey5 = (function (_super) {
     }
     Honey5.prototype.componentWillMount = function () {
         this.gameState = "play";
+        this.props.actions.red(9 + 9 * W);
     };
     Honey5.prototype.shouldComponentUpdate = function () {
         return (this.gameState == "play") ? true : false;
@@ -28992,15 +29061,10 @@ var Honey5 = (function (_super) {
     };
     Honey5.prototype.componentDidMount = function () {
         var _this = this;
-        var TPI = 2 * Math.PI;
-        var INTERVAL = 30;
-        var WIDTH = INTERVAL * 21;
-        var HEIGHT = INTERVAL * 21;
-        var R = INTERVAL / (Math.cos(TPI / 12) * 2);
         var canvas = this.refs.myCanvas;
         var ctx = canvas.getContext('2d');
-        canvas.width = WIDTH;
-        canvas.height = HEIGHT;
+        canvas.width = (W + 1) * INTERVAL;
+        canvas.height = (W + 1) * INTERVAL;
         ctx.fillStyle = '#ffff33';
         var Hex = function (x, y, r) {
             ctx.beginPath();
@@ -29012,44 +29076,27 @@ var Honey5 = (function (_super) {
             ctx.fill();
             ctx.stroke();
         };
-        var honeyCombCoordinates = __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](0, 400).toArray()
-            .map(function (n) {
-            var x = n % 20 + 1;
-            var y = Math.floor(n / 20) + 1;
-            if (y % 2 == 1)
-                return [x * INTERVAL, y * R * 3 / 2];
-            else
-                return [(x + 0.5) * INTERVAL, y * R * 3 / 2];
-        });
+        var honeyCombCoordinates = __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](0, W * H).toArray()
+            .map(function (n) { return p2mouseXY(n); });
         honeyCombCoordinates
-            .map(function (a) { return Hex(a[0], a[1], R); });
+            .map(function (a) { return Hex(a.x, a.y, R); });
+        // for click
         canvas.onmousedown = function (e) {
-            // mouse2honey
             var L2 = function (x, y) { return Math.sqrt(x * x + y * y); };
-            var idx = (honeyCombCoordinates
-                .map(function (a, idx) { return Math.floor(L2(a[0] - e.offsetX, a[1] - e.offsetY) * 1000) * 1000 + idx; })
-                .reduce(function (a, b) { return Math.min(a, b); })) % 1000;
-            var honeyX = idx % 20;
-            var honeyY = Math.floor(idx / 20);
-            if (_this.props.state.step % 2 == 0) {
-                if (_this.props.state.cells[honeyX][honeyY] != -1) {
-                    _this.props.actions.red([honeyX, honeyY]);
-                }
-            }
-            else {
-                if (_this.props.state.cells[honeyX][honeyY] != 1) {
-                    _this.props.actions.blue([honeyX, honeyY]);
-                }
+            var mouse2honey = function (mouseX, mouseY) {
+                var p = (honeyCombCoordinates
+                    .map(function (a, idx) { return Math.floor(L2(a.x - mouseX, a.y - mouseY) * 1000) * 1000 + idx; })
+                    .reduce(function (a, b) { return Math.min(a, b); })) % 1000;
+                return p;
+            };
+            var honeyP = mouse2honey(e.offsetX, e.offsetY);
+            if (_this.props.state.step % 2 == 1 && _this.props.state.cells[honeyP] == 0) {
+                _this.props.actions.blue(honeyP);
             }
         };
     };
     Honey5.prototype.componentDidUpdate = function () {
         var _this = this;
-        var TPI = 2 * Math.PI;
-        var INTERVAL = 30;
-        var WIDTH = INTERVAL * 21;
-        var HEIGHT = INTERVAL * 21;
-        var R = INTERVAL / (Math.cos(TPI / 12) * 2);
         var canvas = this.refs.myCanvas;
         var ctx = canvas.getContext('2d');
         var Hex = function (x, y, r) {
@@ -29062,11 +29109,10 @@ var Honey5 = (function (_super) {
             ctx.fill();
             ctx.stroke();
         };
-        var honeyComb = __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](0, 400).toArray()
-            .map(function (n) {
-            var x = n % 20 + 1;
-            var y = Math.floor(n / 20) + 1;
-            switch (_this.props.state.cells[x - 1][y - 1]) {
+        // for click
+        var honeyComb = __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](0, W * H).toArray()
+            .map(function (p) {
+            switch (_this.props.state.cells[p]) {
                 case 0:
                     ctx.fillStyle = '#ffff22';
                     break;
@@ -29079,45 +29125,37 @@ var Honey5 = (function (_super) {
                 default: ctx.fillStyle = '#ffffff';
             }
             ;
-            if (y % 2 == 1)
-                Hex(x * INTERVAL, y * R * 3 / 2, R);
-            else
-                Hex((x + 0.5) * INTERVAL, y * R * 3 / 2, R);
+            Hex(p2mouseXY(p).x, p2mouseXY(p).y, R);
         });
+        //*****************************************************************************
+        // for termial
         var nextXY = function (x, y, op) {
             switch (op) {
-                case "upperleft":
-                    return y % 2 ? [x, y - 1] : [x - 1, y - 1];
-                case "upperright":
-                    return y % 2 ? [x + 1, y - 1] : [x, y - 1];
-                case "left":
-                    return y % 2 ? [x - 1, y] : [x - 1, y];
-                case "right":
-                    return y % 2 ? [x + 1, y] : [x + 1, y];
-                case "lowerleft":
-                    return y % 2 ? [x, y + 1] : [x - 1, y + 1];
-                case "lowerright":
-                    return y % 2 ? [x + 1, y + 1] : [x, y + 1];
-                default:
-                    return [x, y];
+                case "upperleft": return y % 2 ? [x, y - 1] : [x - 1, y - 1];
+                case "upperright": return y % 2 ? [x + 1, y - 1] : [x, y - 1];
+                case "left": return y % 2 ? [x - 1, y] : [x - 1, y];
+                case "right": return y % 2 ? [x + 1, y] : [x + 1, y];
+                case "lowerleft": return y % 2 ? [x, y + 1] : [x - 1, y + 1];
+                case "lowerright": return y % 2 ? [x + 1, y + 1] : [x, y + 1];
+                default: return [x, y];
             }
         };
-        var x = this.props.state.record[this.props.state.record.length - 1][0];
-        var y = this.props.state.record[this.props.state.record.length - 1][1];
-        var opNtimes = function (x, y, op, n) {
+        var opNtimes = function (p, op, n) {
             if (n < 0)
                 return 0;
-            var nextX = nextXY(x, y, op)[0];
-            var nextY = nextXY(x, y, op)[1];
+            var nextX = nextXY(p2honeyXY(p).x, p2honeyXY(p).y, op)[0];
+            var nextY = nextXY(p2honeyXY(p).x, p2honeyXY(p).y, op)[1];
+            var nextP = nextX + nextY * W;
             if (nextX < 0 || nextX > 19 || nextY < 0 || nextY > 19)
                 return 0;
-            return opNtimes(nextX, nextY, op, n - 1) + _this.props.state.cells[nextX][nextY];
+            return opNtimes(nextP, op, n - 1) + _this.props.state.cells[nextP];
         };
+        var p = this.props.state.record[this.props.state.record.length - 1];
         var scores = __WEBPACK_IMPORTED_MODULE_1_immutable__["Range"](0, 4).toArray()
             .map(function (n) {
-            return [opNtimes(x, y, "upperleft", n) + _this.props.state.cells[x][y] + opNtimes(x, y, "lowerright", 4 - n),
-                opNtimes(x, y, "upperright", n) + _this.props.state.cells[x][y] + opNtimes(x, y, "lowerleft", 4 - n),
-                opNtimes(x, y, "left", n) + _this.props.state.cells[x][y] + opNtimes(x, y, "right", 4 - n),];
+            return [opNtimes(p, "upperleft", n) + _this.props.state.cells[p] + opNtimes(p, "lowerright", 4 - n),
+                opNtimes(p, "upperright", n) + _this.props.state.cells[p] + opNtimes(p, "lowerleft", 4 - n),
+                opNtimes(p, "left", n) + _this.props.state.cells[p] + opNtimes(p, "right", 4 - n),];
         })
             .reduce(function (a, b) { return a.concat(b); });
         var redScore = scores.reduce(function (a, b) { return Math.max(a, b); });
@@ -29125,6 +29163,8 @@ var Honey5 = (function (_super) {
         ctx.fillStyle = "#000000";
         ctx.font = "80pt Arial";
         ctx.textAlign = "center";
+        var WIDTH = (W + 1) * INTERVAL;
+        var HEIGHT = (H + 1) * INTERVAL;
         if (redScore == 5) {
             this.gameState = "GameOver";
             ctx.fillText("Red win!", WIDTH / 2, HEIGHT / 2);
@@ -29134,6 +29174,13 @@ var Honey5 = (function (_super) {
             this.gameState = "GameOver";
             ctx.fillText("Blue win", WIDTH / 2, HEIGHT / 2);
         }
+        // for AI
+        if (this.props.state.step % 2 == 0) {
+            Bee.readCells(this.props.state.cells);
+            var p_1 = Bee.neighbor();
+            var lastRecord = this.props.state.record[this.props.state.record.length - 1];
+            setTimeout(function () { return _this.props.actions.red(p_1); }, 1000);
+        }
     };
     return Honey5;
 }(__WEBPACK_IMPORTED_MODULE_0_react__["Component"]));
@@ -29141,7 +29188,7 @@ var Honey5 = (function (_super) {
 
 
 /***/ }),
-/* 220 */
+/* 221 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -29169,7 +29216,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 221 */
+/* 222 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
