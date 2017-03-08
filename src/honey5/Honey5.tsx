@@ -11,6 +11,7 @@ const R = INTERVAL/(Math.cos(TPI/12)*2);
 const W = 19;
 const H = 19;
 
+// coordinate transformation
 const p2honeyXY = ( p:number ) => { return { x:p%W, y:Math.floor(p/W) }};
 const hoenyXY2mouseXY = ( x:number, y:number ) => {
   return { x: y%2==0? (x+1)*INTERVAL : (x+1.5)*INTERVAL , y: (y+1)*R*3/2 }}
@@ -75,7 +76,7 @@ export class Honey5 extends React.Component<Props, {}> {
     honeyCombCoordinates
       .map( a => Hex(a.x,a.y,R) )
 
-    // for click
+// for click
     canvas.onmousedown = e => {
       const L2 = (x:number,y:number) => Math.sqrt( x*x + y*y );
       const mouse2honey = ( mouseX:number, mouseY:number) => {
@@ -107,7 +108,7 @@ export class Honey5 extends React.Component<Props, {}> {
       ctx.stroke();
     };
 
-    // for click
+// for click
     const honeyComb = Immutable.Range(0,W*H).toArray()
       .map( p => {
         switch( this.props.state.cells[p] ){
@@ -118,7 +119,14 @@ export class Honey5 extends React.Component<Props, {}> {
         };
         Hex( p2mouseXY(p).x, p2mouseXY(p).y , R ) });
 
-//*****************************************************************************
+// for AI
+    if( this.props.state.step%2 == 0 ){
+      Bee.readCells( this.props.state.cells );
+      const p = Bee.greedy();
+      const lastRecord = this.props.state.record[this.props.state.record.length-1];
+      setTimeout( () => this.props.actions.red( p ) , 1000);
+    }
+
 // for termial
     const nextXY = ( x:number, y:number, op:string ) => {
       switch( op ){
@@ -141,16 +149,16 @@ export class Honey5 extends React.Component<Props, {}> {
     }
 
     const p = this.props.state.record[this.props.state.record.length-1];
-
     const scores = Immutable.Range(0,4).toArray()
       .map( n =>
           [ opNtimes(p,"upperleft",n)  + this.props.state.cells[p] + opNtimes(p,"lowerright",4-n),
             opNtimes(p,"upperright",n) + this.props.state.cells[p] + opNtimes(p,"lowerleft",4-n),
             opNtimes(p,"left",n)       + this.props.state.cells[p] + opNtimes(p,"right",4-n),     ])
       .reduce( (a,b) => a.concat(b) )
+      .filter( a => !( Number.isNaN(a) ));
     const redScore = scores.reduce( (a,b) => Math.max(a,b));
     const blueScore = scores.reduce( (a,b) => Math.min(a,b));
-
+    console.log(scores);
     ctx.fillStyle = "#000000";
     ctx.font = "80pt Arial";
     ctx.textAlign = "center";
@@ -165,14 +173,6 @@ export class Honey5 extends React.Component<Props, {}> {
     if( blueScore == -5 ){
       this.gameState = "GameOver";
       ctx.fillText("Blue win", WIDTH/2, HEIGHT/2);
-    }
-
-// for AI
-    if( this.props.state.step%2 == 0 ){
-      Bee.readCells( this.props.state.cells );
-      const p = Bee.neighbor();
-      const lastRecord = this.props.state.record[this.props.state.record.length-1];
-      setTimeout( () => this.props.actions.red( p ) , 1000);
     }
 
   }
