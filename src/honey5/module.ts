@@ -1,3 +1,4 @@
+import * as ObjectAssign from 'object-assign';
 import * as Immutable from 'immutable';
 
 const W = 19;
@@ -42,7 +43,7 @@ export default function reducer(
       //const redRecord= Immutable.List.of(...state.record).push(action.position);
       let redRecord = state.record;
       redRecord.push(action.position);
-      return Object.assign({}, state, { cells: redCells, step: state.step + 1, record: redRecord});
+      return ObjectAssign({}, state, { cells: redCells, step: state.step + 1, record: redRecord});
 
     case ActionTypes.BLUE:
       const blueCells = state.cells
@@ -50,11 +51,11 @@ export default function reducer(
           ( idx%W == action.position%W && Math.floor(idx/W) == Math.floor(action.position/W) )? -1: value );
       let blueRecord = state.record;
       blueRecord.push(action.position);
-      return Object.assign({}, state, { cells: blueCells, step: state.step + 1, record: blueRecord });
+      return ObjectAssign({}, state, { cells: blueCells, step: state.step + 1, record: blueRecord });
 
     case ActionTypes.UNDO:
       if (state.step<=0){
-        return Object.assign({}, state, { step: 0 });
+        return ObjectAssign({}, state, { step: 0 });
       }
       let undoRecord = state.record;
       const lastRecord = undoRecord.pop();
@@ -64,7 +65,7 @@ export default function reducer(
         ( idx%W == lastRecord%W && Math.floor(idx/W) == Math.floor(lastRecord/W) )? 0: value )
       .map( ( value,idx ) =>
         ( idx%W == boobyRecord%W && Math.floor(idx/W) == Math.floor(boobyRecord/W) )? 0: value );
-      return Object.assign({}, state, { cells: undoCells, step: state.step - 2 , record: undoRecord });
+      return ObjectAssign({}, state, { cells: undoCells, step: state.step - 2 , record: undoRecord });
 
     default:
       return state;

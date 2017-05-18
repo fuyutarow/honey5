@@ -98,7 +98,7 @@ export default class Queenbee {
           opNtimes(p,"upperright",n) + this.cells[p] + opNtimes(p,"lowerleft",4-n),
           opNtimes(p,"left",n)       + this.cells[p] + opNtimes(p,"right",4-n),     ])
       .reduce( (a,b) => a.concat(b) )
-      .filter( a => !( Number.isNaN(a) ))
+      .filter( a => !isNaN(Number(a)) )
       .reduce( (a,b) => Math.max(a,b) );
 
     const maxRedScore = neighborhoods

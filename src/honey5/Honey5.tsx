@@ -155,10 +155,9 @@ export class Honey5 extends React.Component<Props, {}> {
             opNtimes(p,"upperright",n) + this.props.state.cells[p] + opNtimes(p,"lowerleft",4-n),
             opNtimes(p,"left",n)       + this.props.state.cells[p] + opNtimes(p,"right",4-n),     ])
       .reduce( (a,b) => a.concat(b) )
-      .filter( a => !( Number.isNaN(a) ));
+      .filter( a => !( isNaN((a))) );
     const redScore = scores.reduce( (a,b) => Math.max(a,b));
     const blueScore = scores.reduce( (a,b) => Math.min(a,b));
-    console.log(scores);
     ctx.fillStyle = "#000000";
     ctx.font = "80pt Arial";
     ctx.textAlign = "center";
