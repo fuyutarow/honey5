@@ -2,13 +2,13 @@ Honey5
 =====
 
 <br>
-<a href="https://ytro10.github.io/honey5/">
-<img src="https://github.com/ytro10/honey5/blob/master/docs/honeycobm.gif" width="300" />
+<a href="https://fytroo.github.io/honey5/">
+<img src="https://github.com/fytroo/honey5/blob/master/docs/honeycobm.gif" width="300" />
 </a>
 
 ## Demo
 
-https://ytro10.github.io/honey5/
+https://fytroo.github.io/honey5/
 
 ## Requirement
 
@@ -38,4 +38,4 @@ Enjoy honeycomb:honeybee::honeybee:
 Five in line<br>
 This is a board game for two players. Each players' goal is to make a row of bees.<br>
 Red plays first, and you are blue player.
-Let's <a href="https://sktnkysh.github.io/honey5/">play</a>!
+Let's <a href="https://fytroo.github.io/honey5/">play</a>!
