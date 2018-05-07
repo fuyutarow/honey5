@@ -2,8 +2,8 @@ Honey5
 =====
 
 <br>
-<a href="https://fytroo.github.io/honey5/">
-<img src="https://github.com/fytroo/honey5/blob/master/docs/honeycobm.gif" width="300" />
+<a href="https://sktnkysh.github.io/honey5/">
+<img src="https://github.com/sktnkysh/honey5/blob/master/docs/honeycobm.gif" width="300" />
 </a>
 
 ## Demo
